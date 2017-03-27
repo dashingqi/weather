@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="core-1.5.1">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../Android SDK/.android/build-cache/ab87b43c4d2df11d9feef8c2dc17a699b6443b85/output/res" />
+      <root url="jar://$PROJECT_DIR$/../../Android SDK/.android/build-cache/ab87b43c4d2df11d9feef8c2dc17a699b6443b85/output/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.litepal.android/core/1.5.1/42301acac42694fe44f1fc8b11cd59cf7ee78a81/core-1.5.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
