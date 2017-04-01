@@ -1,6 +1,8 @@
 package weather.dashingqi.com.weather;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -47,6 +49,13 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(Build.VERSION.SDK_INT>=21){
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            |View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        }
         setContentView(R.layout.activity_weather);
         //初始化各控件
         weatherLayout = (ScrollView) findViewById(R.id.sv_weather_layout);
@@ -60,16 +69,9 @@ public class WeatherActivity extends AppCompatActivity {
         comfortText = (TextView) findViewById(R.id.tv_comfort_text);
         carWashText = (TextView) findViewById(R.id.tv_car_wash_text);
         sportText = (TextView) findViewById(R.id.tv_sport_text);
-
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String bing_pic = prefs.getString("bing_pic", null);
-        if(bing_pic!=null){
-            Glide.with(this).load(bing_pic).into(bingPicImg);
-        }else{
-            loadBingPic();
-        }
         String weatherString = prefs.getString("weather", null);
         if(weatherString!=null){
             //有缓存时直接解析天气的数据
@@ -80,6 +82,12 @@ public class WeatherActivity extends AppCompatActivity {
             String weatherId = getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
+        }
+        String bing_pic = prefs.getString("bing_pic", null);
+        if(bing_pic!=null){
+            Glide.with(this).load(bing_pic).into(bingPicImg);
+        }else{
+            loadBingPic();
         }
 
     }
@@ -121,7 +129,7 @@ public class WeatherActivity extends AppCompatActivity {
      */
     private void requestWeather(String weatherId) {
         String weatherUrl = "http://guolin.tech/api/weather?cityid="+weatherId+
-                "&key=bc0418b57b2d4918819d3974ac1285d9";
+                "&key=d6bdd8550a4746d19c011e1338fc0683";
         HttpUtil.sendOKHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -164,7 +172,7 @@ public class WeatherActivity extends AppCompatActivity {
      */
     private void showWeatherInfo(Weather weather) {
         String cityName = weather.basic.cityName;
-        String updateTime = weather.basic.updata.updataTime.split(" ")[1];
+        String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "℃";
         String weatherInfo = weather.now.more.info;
         titleCity.setText(cityName);
@@ -189,9 +197,9 @@ public class WeatherActivity extends AppCompatActivity {
             aqiTxt.setText(weather.aqi.city.aqi);
             pm25Txt.setText(weather.aqi.city.pm25);
         }
-        String comfort = "舒适度"+weather.suggestion.comfort.info;
-        String carWash = "洗车指数"+weather.suggestion.carWash.info;
-        String  sport = "运动指数"+weather.suggestion.sport.info;
+        String comfort = "舒适度："+weather.suggestion.comfort.info;
+        String carWash = "洗车指数："+weather.suggestion.carWash.info;
+        String  sport = "运动指数："+weather.suggestion.sport.info;
         comfortText.setText(comfort);
         carWashText.setText(carWash);
         sportText.setText(sport);
