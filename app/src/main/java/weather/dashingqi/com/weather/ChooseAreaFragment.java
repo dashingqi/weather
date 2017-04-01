@@ -1,6 +1,7 @@
 package weather.dashingqi.com.weather;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -50,7 +51,7 @@ public class ChooseAreaFragment extends Fragment {
     private ProgressDialog progressDialog;
     //数组适配器 给listview填充数据的
     private ArrayAdapter<String> adapter;
-    private List dataList = new ArrayList();
+    private List dateList = new ArrayList();
     /**
      * 省的列表
      */
@@ -87,7 +88,7 @@ public class ChooseAreaFragment extends Fragment {
         btn_back = (Button) view.findViewById(R.id.btn_back);
         tv_title = (TextView) view.findViewById(R.id.tv_title);
         lv_view = (ListView) view.findViewById(R.id.lv_view);
-        adapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,dataList);
+        adapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1, dateList);
         lv_view.setAdapter(adapter);
         return view;
     }
@@ -104,8 +105,13 @@ public class ChooseAreaFragment extends Fragment {
                 }else if (currentLevel==LEVEL_CITY){
                     selectedCity=cityList.get(position);
                     queryCounties();
+                }else if(currentLevel==LEVEL_COUNTY){
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
-
             }
         });
         btn_back.setOnClickListener(new View.OnClickListener() {
@@ -131,10 +137,10 @@ public class ChooseAreaFragment extends Fragment {
         btn_back.setVisibility(View.GONE);
         provinceList = DataSupport.findAll(Province.class);
             if(provinceList.size()>0){
-            dataList.clear();
+            dateList.clear();
             //遍历集合 取数据
             for (Province province :provinceList){
-                dataList.add(province.getProvinceName());
+                dateList.add(province.getProvinceName());
             }
             //刷新适配器
             adapter.notifyDataSetChanged();
@@ -155,9 +161,9 @@ public class ChooseAreaFragment extends Fragment {
         btn_back.setVisibility(View.VISIBLE);
         cityList=DataSupport.where("provinceid=?",String.valueOf(selectedProince.getId())).find(City.class);
         if(cityList.size()>0){
-            dataList.clear();
+            dateList.clear();
             for (City city:cityList){
-                dataList.add(city.getCityName());
+                dateList.add(city.getCityName());
             }
             adapter.notifyDataSetChanged();
             lv_view.setSelection(0);
@@ -178,9 +184,9 @@ public class ChooseAreaFragment extends Fragment {
         //进行数据库的查询
         countyList=DataSupport.where("cityid=?",String.valueOf(selectedCity.getId())).find(County.class);
         if (countyList.size()>0){
-            dataList.clear();
+            dateList.clear();
             for (County county : countyList){
-                dataList.add(county.getCountyName());
+                dateList.add(county.getCountyName());
             }
             adapter.notifyDataSetChanged();
             lv_view.setSelection(0);
