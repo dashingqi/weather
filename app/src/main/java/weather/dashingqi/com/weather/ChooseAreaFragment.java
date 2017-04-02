@@ -27,6 +27,7 @@ import okhttp3.Response;
 import weather.dashingqi.com.weather.db.City;
 import weather.dashingqi.com.weather.db.County;
 import weather.dashingqi.com.weather.db.Province;
+import weather.dashingqi.com.weather.gson.Weather;
 import weather.dashingqi.com.weather.util.HttpUtil;
 import weather.dashingqi.com.weather.util.Utility;
 
@@ -107,10 +108,18 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 }else if(currentLevel==LEVEL_COUNTY){
                     String weatherId = countyList.get(position).getWeatherId();
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    intent.putExtra("weather_id",weatherId);
-                    startActivity(intent);
-                    getActivity().finish();
+                    if(getActivity() instanceof  MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }else if(getActivity() instanceof WeatherActivity){
+                        WeatherActivity  weatherActivity = (WeatherActivity) getActivity();
+                        weatherActivity.drawerLayout.closeDrawers();
+                        weatherActivity.srlSwipeRefresh.setRefreshing(true);
+                       // String weatherIds = countyList.get(position).getWeatherId();
+                        weatherActivity.requestWeather(weatherId);
+                    }
                 }
             }
         });

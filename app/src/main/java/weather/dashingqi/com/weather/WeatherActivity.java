@@ -6,10 +6,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -46,8 +49,10 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView carWashText;
     private TextView sportText;
     private ImageView bingPicImg;
-    private SwipeRefreshLayout srlSwipeRefresh;
+    public  SwipeRefreshLayout srlSwipeRefresh;
     private String weatherId;
+    private Button navButton;
+    public  DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,6 +87,14 @@ public class WeatherActivity extends AppCompatActivity {
         srlSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.srl_swipe_refresh);
         //设置向下拉 刷新的进度条颜色
         srlSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        navButton = (Button) findViewById(R.id.btn_nav);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
 
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -147,7 +160,7 @@ public class WeatherActivity extends AppCompatActivity {
      * 根据天气id请求城市天气信息
      * @param weatherId
      */
-    private void requestWeather(String weatherId) {
+    public  void requestWeather(String weatherId) {
         String weatherUrl = "http://guolin.tech/api/weather?cityid="+weatherId+
                 "&key=bc0418b57b2d4918819d3974ac1285d9";
         HttpUtil.sendOKHttpRequest(weatherUrl, new Callback() {
