@@ -153,7 +153,6 @@ public class ChooseAreaFragment extends Fragment {
             }
             //刷新适配器
             adapter.notifyDataSetChanged();
-            //默认选中第一个
             lv_view.setSelection(0);
             currentLevel=LEVEL_PROVINCE;
         }else{
