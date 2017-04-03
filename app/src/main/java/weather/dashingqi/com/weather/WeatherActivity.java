@@ -54,6 +54,7 @@ public class WeatherActivity extends AppCompatActivity {
     public  SwipeRefreshLayout srlSwipeRefresh;
     private Button navButton;
     public  DrawerLayout drawerLayout;
+    private String mWeatherId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +68,9 @@ public class WeatherActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_weather);
         initView();
+        //界面一初始化 就去加载图片 再次进入
+        loadBingPic();
+
     }
 
     /**
@@ -90,34 +94,32 @@ public class WeatherActivity extends AppCompatActivity {
         srlSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         navButton = (Button) findViewById(R.id.btn_nav);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
 
-
-        final  String weatherId;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather", null);
         if(weatherString!=null){
             //有缓存时直接解析天气的数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
-            weatherId=weather.basic.weatherId;
+            mWeatherId =weather.basic.weatherId;
             showWeatherInfo(weather);
         }else{
             //没有缓存是 就去服务器去取数据
-             weatherId = getIntent().getStringExtra("weather_id");
+             mWeatherId = getIntent().getStringExtra("weather_id");
              weatherLayout.setVisibility(View.INVISIBLE);
-              requestWeather(weatherId);
+              requestWeather(mWeatherId);
         }
         //为swiperefersh 设置监听事件 有刷新 就去服务器取数据
         srlSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh() {
 
-                requestWeather(weatherId);
+                requestWeather(mWeatherId);
+            }
+        });
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
         String bing_pic = prefs.getString("bing_pic", null);
@@ -126,7 +128,6 @@ public class WeatherActivity extends AppCompatActivity {
         }else{
             loadBingPic();
         }
-
     }
 
     /**
@@ -163,7 +164,7 @@ public class WeatherActivity extends AppCompatActivity {
      * @param weatherId
      */
     public  void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid="+weatherId+
+        final String weatherUrl = "http://guolin.tech/api/weather?cityid="+weatherId+
                 "&key=bc0418b57b2d4918819d3974ac1285d9";
         HttpUtil.sendOKHttpRequest(weatherUrl, new Callback() {
             @Override
@@ -189,6 +190,9 @@ public class WeatherActivity extends AppCompatActivity {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
                             SharedPreferences.Editor edit = prefs.edit();
                             edit.putString("weather",responseText);
+                            //此处获取WeatherId 当再次选择城市 后刷新不会再次重回第一次选择的城市天气界面
+                            //此时刷新去服务器 的WeatherId就是现在选择的页面
+                            mWeatherId=weather.basic.weatherId;
                             edit.apply();
                             showWeatherInfo(weather);
                         }else{
